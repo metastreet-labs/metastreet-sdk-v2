@@ -22,7 +22,7 @@ export class TickEncoder {
   /**
    * Decode a tick
    * @param tick Encoded tick
-   * @return Decoded tick
+   * @returns Decoded tick
    */
   static decode(tick: EncodedTick): DecodedTick {
     return {
@@ -36,7 +36,7 @@ export class TickEncoder {
   /**
    * Encode a tick
    * @param tick Decoded tick
-   * @return Encoded tick
+   * @returns Encoded tick
    */
   static encode(tick: DecodedTick): EncodedTick {
     return (

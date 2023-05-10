@@ -86,7 +86,7 @@ export class TickRouter {
    * @param duration Duration in seconds
    * @param multiplier Multiplier in amount
    * @param numNodes Number of liquidity nodes to use (maximum)
-   * @return Liquidity available
+   * @returns Liquidity available
    */
   forecast(nodes: LiquidityNode[], duration: number, multiplier: number = 1, numNodes: number = 10): bigint {
     const filteredNodes = this._filterNodes(nodes, duration).splice(-numNodes);
@@ -103,7 +103,7 @@ export class TickRouter {
    * @param duration Duration in seconds
    * @param multiplier Multiplier in amount
    * @param numNodes Number of liquidity nodes to use (maximum)
-   * @return Encoded ticks
+   * @returns Encoded ticks
    */
   route(
     nodes: LiquidityNode[],
