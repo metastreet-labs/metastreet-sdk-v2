@@ -18,7 +18,7 @@ describe('TickRouter', function () {
   let router: TickRouter;
 
   beforeEach(function () {
-    router = new TickRouter([7 * 86400, 14 * 86400, 30 * 86400], [3170979198, 9512937595, 15854895991]);
+    router = new TickRouter([7 * 86400, 14 * 86400, 30 * 86400], [3170979198n, 9512937595n, 15854895991n]);
   });
 
   it('#_mapDuration', function () {

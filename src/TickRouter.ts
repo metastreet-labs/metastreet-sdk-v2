@@ -16,13 +16,18 @@ function minBigInt(a: bigint, b: bigint): bigint {
 
 export class TickRouter {
   readonly durations: number[];
-  readonly rates: number[];
+  readonly rates: bigint[];
 
   /****************************************************************************/
   /* Constructor */
   /****************************************************************************/
 
-  constructor(durations: number[], rates: number[]) {
+  /**
+   * Constructor
+   * @param durations Durations in seconds (ascending)
+   * @param rates Rates in interest per second (ascending)
+   */
+  constructor(durations: number[], rates: bigint[]) {
     this.durations = durations;
     this.rates = rates;
   }
