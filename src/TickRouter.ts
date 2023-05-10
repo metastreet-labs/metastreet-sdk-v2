@@ -191,7 +191,7 @@ export class TickRouter {
     /* Take top number of nodes on route */
     const topNodes = route.nodes.splice(-numNodes);
 
-    /* Check sufficinet liquidity is available in nodes */
+    /* Check sufficient liquidity is available in nodes */
     if (this._sourceNodes(topNodes, amount, multiplier) != amount) {
       throw new Error(`Insufficient liquidity for ${amount} amount.`);
     }
