@@ -18,6 +18,9 @@ export class TickRouter {
   readonly durations: number[];
   readonly rates: bigint[];
 
+  /* Fixed point scale */
+  readonly FIXED_POINT_SCALE = 10n ** 18n;
+
   /* Prune nodes that contribute less than 1% to total amount */
   readonly PRUNE_AMOUNT_BASIS_POINTS = 100n;
 
@@ -210,5 +213,47 @@ export class TickRouter {
     }
 
     return limitedPrunedRoute.map((n) => TickEncoder.encode(n.tick));
+  }
+
+  /**
+   * Quote repayment for amount.
+   * @param nodes Liquidity nodes
+   * @param ticks Ticks to use
+   * @param amount Total amount
+   * @param duration Duration in seconds
+   * @param multiplier Multiplier in amount
+   * @returns Repayment amount
+   */
+  quote(
+    nodes: LiquidityNode[],
+    ticks: EncodedTick[],
+    amount: bigint,
+    duration: number,
+    multiplier: number = 1,
+  ): bigint {
+    /* Reconstruct route from selected ticks */
+    const route = this._decodeNodes(nodes.filter((n) => ticks.includes(n.tick)));
+
+    /* Source liquidity from nodes */
+    const [total, sources] = this._sourceNodes(route, amount, multiplier);
+
+    /* Check sufficient liquidity is available */
+    if (total != amount) {
+      throw new Error(`Insufficient liquidity for ${amount} amount.`);
+    }
+
+    /* Accumulate weighted rate */
+    let weightedRate: bigint = 0n;
+    for (let i = 0; i < sources.length; i++) {
+      weightedRate += (sources[i] * this.rates[route[i].tick.rate]) / this.FIXED_POINT_SCALE;
+    }
+
+    /* Normalize weighted rate by amount */
+    weightedRate = (weightedRate * this.FIXED_POINT_SCALE) / amount;
+
+    /* Calculate repayment */
+    const repayment = (amount * (this.FIXED_POINT_SCALE + weightedRate * BigInt(duration))) / this.FIXED_POINT_SCALE;
+
+    return repayment;
   }
 }

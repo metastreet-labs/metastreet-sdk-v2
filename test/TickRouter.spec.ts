@@ -43,6 +43,14 @@ const TEST_NODES_4: LiquidityNode[] = [
   { tick: TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }), available: 100n },
 ];
 
+const TEST_NODES_5: LiquidityNode[] = [
+  { tick: TickEncoder.encode({ limit: 0n, duration: 0, rate: 0 }), available: 0n },
+  { tick: TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 0 }), available: 1000n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 100n * 10n ** 18n, duration: 0, rate: 0 }), available: 500n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 150n * 10n ** 18n, duration: 0, rate: 1 }), available: 250n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 200n * 10n ** 18n, duration: 0, rate: 2 }), available: 100n * 10n ** 18n },
+];
+
 describe('TickRouter', function () {
   let router: TickRouter;
 
@@ -268,5 +276,12 @@ describe('TickRouter', function () {
       TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
       TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
     ]);
+  });
+
+  it('#quote', function () {
+    const ticks1 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 1);
+    expect(router.quote(TEST_NODES_5, ticks1, 200n * 10n ** 18n, 3 * 86400, 1)).toEqual(200410958904060800000n);
+    const ticks2 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 3);
+    expect(router.quote(TEST_NODES_5, ticks2, 550n * 10n ** 18n, 3 * 86400, 3)).toEqual(551027397260216800000n);
   });
 });
