@@ -133,15 +133,18 @@ export class TickRouter {
     return nodes.splice(-count);
   }
 
-  _sourceNodes(nodes: DecodedLiquidityNode[], amount: bigint, multiplier: number): bigint {
+  _sourceNodes(nodes: DecodedLiquidityNode[], amount: bigint, multiplier: number): [bigint, bigint[]] {
     /* Source as much liquidity from nodes as possible, up to the limit, amount
      * available, and amount remaining */
+    const sources: bigint[] = [];
     let taken = 0n;
     for (const node of nodes) {
-      taken += minBigInt(minBigInt(node.tick.limit * BigInt(multiplier) - taken, node.available), amount - taken);
+      const take = minBigInt(minBigInt(node.tick.limit * BigInt(multiplier) - taken, node.available), amount - taken);
+      sources.push(take);
+      taken += take;
     }
 
-    return taken;
+    return [taken, sources];
   }
 
   /****************************************************************************/
@@ -170,7 +173,7 @@ export class TickRouter {
     const limitedPrunedRoute = this._limitNodes(prunedRoute, numNodes);
 
     /* Source maximum liquidity from nodes */
-    return this._sourceNodes(limitedPrunedRoute, 2n ** 120n - 1n, multiplier);
+    return this._sourceNodes(limitedPrunedRoute, 2n ** 120n - 1n, multiplier)[0];
   }
 
   /**
@@ -201,8 +204,8 @@ export class TickRouter {
     /* Limit nodes in route */
     const limitedPrunedRoute = this._limitNodes(prunedRoute, numNodes);
 
-    /* Check sufficient liquidity is available in limited, pruned routej */
-    if (this._sourceNodes(limitedPrunedRoute, amount, multiplier) != amount) {
+    /* Check sufficient liquidity is available in limited, pruned route */
+    if (this._sourceNodes(limitedPrunedRoute, amount, multiplier)[0] != amount) {
       throw new Error(`Insufficient liquidity for ${amount} amount.`);
     }
 
