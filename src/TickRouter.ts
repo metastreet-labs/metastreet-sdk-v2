@@ -106,7 +106,7 @@ export class TickRouter {
           : { ...scoreSubroute([a], amount), node: a },
       );
 
-      /* Sort scores for highest amount at lowest cost */
+      /* Find best score with highest amount at lowest cost */
       const bestScore = scores.reduce(
         (bestScore, score) =>
           score.available > bestScore.available ||
@@ -116,7 +116,7 @@ export class TickRouter {
         scores[0],
       );
 
-      /* Update cumulative amount and route */
+      /* Update cumulative amount and route along best score node */
       amount += minBigInt(bestScore.node.tick.limit * BigInt(multiplier) - amount, bestScore.node.available);
       route.push(bestScore.node);
     }
