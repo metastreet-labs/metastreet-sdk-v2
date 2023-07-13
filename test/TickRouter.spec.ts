@@ -250,11 +250,11 @@ describe('TickRouter', function () {
     ]);
 
     /* 30 days, over available */
-    expect(() => router.route(TEST_NODES_1, 51n, 30 * 86400, 1)).toThrow();
+    expect(() => router.route(TEST_NODES_1, 51n, 30 * 86400, 1)).toThrow(/Insufficient liquidity/);
 
     /* 35 days */
     expect(router.route(TEST_NODES_1, 0n, 35 * 86400, 1)).toEqual([]);
-    expect(() => router.route(TEST_NODES_1, 1n, 35 * 86400, 1)).toThrow();
+    expect(() => router.route(TEST_NODES_1, 1n, 35 * 86400, 1)).toThrow(/Insufficient liquidity/);
 
     /* Nodes with dust */
     expect(router.route(TEST_NODES_4, 350n, 3 * 86400, 1)).toEqual([
