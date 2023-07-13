@@ -280,7 +280,12 @@ describe('TickRouter', function () {
 
   it('#quote', function () {
     const ticks1 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 1);
+    expect(router.quote(TEST_NODES_5, [], 0n, 3 * 86400, 1)).toEqual(0n);
+    expect(router.quote(TEST_NODES_5, ticks1, 0n, 3 * 86400, 1)).toEqual(0n);
     expect(router.quote(TEST_NODES_5, ticks1, 200n * 10n ** 18n, 3 * 86400, 1)).toEqual(200410958904060800000n);
+    expect(() => router.quote(TEST_NODES_5, [], 200n * 10n ** 18n, 3 * 86400, 1)).toThrow(/Insufficient liquidity/);
+    expect(() => router.quote(TEST_NODES_5, ticks1, 300n * 10n ** 18n, 3 * 86400, 1)).toThrow(/Insufficient liquidity/);
+
     const ticks2 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 3);
     expect(router.quote(TEST_NODES_5, ticks2, 550n * 10n ** 18n, 3 * 86400, 3)).toEqual(551027397260216800000n);
   });
