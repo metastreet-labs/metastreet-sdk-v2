@@ -231,6 +231,9 @@ export class TickRouter {
     duration: number,
     multiplier: number = 1,
   ): bigint {
+    /* Handle zero case */
+    if (amount == 0n) return 0n;
+
     /* Reconstruct route from selected ticks */
     const route = this._decodeNodes(nodes.filter((n) => ticks.includes(n.tick)));
 
