@@ -102,52 +102,35 @@ describe('TickRouter', function () {
     expect(router._filterNodes(nodes, 35 * 86400)).toEqual([]);
   });
 
-  it('#_aggregateNodes', function () {
-    expect(router._aggregateNodes(router._decodeNodes(TEST_NODES_1))).toEqual([
-      [{ tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n }],
-      [{ tick: { limit: 25n, duration: 2, rate: 0, reserved: 0n }, available: 500n }],
-      [
-        { tick: { limit: 50n, duration: 0, rate: 2, reserved: 0n }, available: 0n },
-        { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
-        { tick: { limit: 50n, duration: 2, rate: 1, reserved: 0n }, available: 200n },
-      ],
-      [
-        { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
-        { tick: { limit: 100n, duration: 1, rate: 2, reserved: 0n }, available: 100n },
-      ],
-    ]);
-  });
-
   it('#_traverseNodes', function () {
-    expect(router._traverseNodes(router._aggregateNodes(router._decodeNodes(TEST_NODES_1)), 1)).toEqual({
+    expect(router._traverseNodes(router._decodeNodes(TEST_NODES_1), 1)).toEqual({
       amount: 100n,
       route: [
-        { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
         { tick: { limit: 25n, duration: 2, rate: 0, reserved: 0n }, available: 500n },
         { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
         { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
       ],
     });
 
-    expect(router._traverseNodes(router._aggregateNodes(router._decodeNodes(TEST_NODES_1)), 3)).toEqual({
+    expect(router._traverseNodes(router._decodeNodes(TEST_NODES_1), 3)).toEqual({
       amount: 300n,
       route: [
-        { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
         { tick: { limit: 25n, duration: 2, rate: 0, reserved: 0n }, available: 500n },
         { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
         { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
       ],
     });
 
-    expect(router._traverseNodes(router._aggregateNodes(router._decodeNodes(TEST_NODES_2)), 1)).toEqual({
+    expect(router._traverseNodes(router._decodeNodes(TEST_NODES_2), 1)).toEqual({
       amount: 25n,
       route: [
-        { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
         { tick: { limit: 5n, duration: 0, rate: 0, reserved: 0n }, available: 5n },
+        { tick: { limit: 10n, duration: 0, rate: 0, reserved: 0n }, available: 1n },
         { tick: { limit: 10n, duration: 0, rate: 1, reserved: 0n }, available: 4n },
         { tick: { limit: 15n, duration: 0, rate: 2, reserved: 0n }, available: 10n },
         { tick: { limit: 20n, duration: 0, rate: 1, reserved: 0n }, available: 4n },
-        { tick: { limit: 25n, duration: 0, rate: 1, reserved: 0n }, available: 12n },
+        { tick: { limit: 20n, duration: 0, rate: 2, reserved: 0n }, available: 1n },
+        { tick: { limit: 25n, duration: 0, rate: 0, reserved: 0n }, available: 5n },
       ],
     });
   });

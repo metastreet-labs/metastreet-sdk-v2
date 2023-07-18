@@ -56,72 +56,35 @@ export class TickRouter {
     return nodes.filter((n) => n.tick.duration >= durationIndex);
   }
 
-  _aggregateNodes(nodes: DecodedLiquidityNode[]): DecodedLiquidityNode[][] {
-    const aggregatedNodes: DecodedLiquidityNode[][] = [];
-
-    /* Aggregate all nodes with same limit */
-    let prevLimit = -1n;
-    for (const node of nodes) {
-      if (node.tick.limit == prevLimit) {
-        aggregatedNodes[aggregatedNodes.length - 1].push(node);
-      } else {
-        aggregatedNodes.push([node]);
-        prevLimit = node.tick.limit;
-      }
-    }
-
-    return aggregatedNodes;
-  }
-
-  _traverseNodes(
-    aggregatedNodes: DecodedLiquidityNode[][],
-    multiplier: number,
-  ): { amount: bigint; route: DecodedLiquidityNode[] } {
-    /* Helper function to calculate liquidity available along a set of nodes
-     * and its cost */
-    function scoreSubroute(nodes: DecodedLiquidityNode[], offset: bigint): { available: bigint; cost: bigint } {
-      let available = 0n;
-      let cost = 0n;
-
-      for (const node of nodes) {
-        const take = minBigInt(node.tick.limit * BigInt(multiplier) - (available + offset), node.available);
-        available += take;
-        cost += take * BigInt(node.tick.rate + 1);
-      }
-
-      return { available, cost };
-    }
-
+  _traverseNodes(nodes: DecodedLiquidityNode[], multiplier: number): { amount: bigint; route: DecodedLiquidityNode[] } {
     /* Cumulative amount and route taken */
     let amount = 0n;
     const route: DecodedLiquidityNode[] = [];
 
-    /* For each aggregation of nodes at a loan limit */
-    for (let i = 0; i < aggregatedNodes.length; i++) {
-      /* Get next set of aggregated nodes */
-      const nextAggregatedNodes = i + 1 < aggregatedNodes.length ? aggregatedNodes[i + 1] : null;
+    while (true) {
+      /* Filter available nodes by tick limit and monotonic tick */
+      const availableNodes = nodes.filter((node) => {
+        return (
+          node.available > 0n &&
+          node.tick.limit * BigInt(multiplier) > amount &&
+          TickEncoder.encode(node.tick) > (route.length == 0 ? 0n : TickEncoder.encode(route[route.length - 1].tick))
+        );
+      });
 
-      /* Collect scores of all nodes at this loan limit combined with nodes
-       * in the next loan limit */
-      const scores = aggregatedNodes[i].flatMap((a) =>
-        nextAggregatedNodes
-          ? nextAggregatedNodes.map((b) => ({ ...scoreSubroute([a, b], amount), node: a }))
-          : { ...scoreSubroute([a], amount), node: a },
+      /* If no nodes are available, break */
+      if (availableNodes.length === 0) break;
+
+      /* Sort nodes by cost of capital and duration */
+      availableNodes.sort((a: DecodedLiquidityNode, b: DecodedLiquidityNode): number =>
+        TickEncoder.encode(a.tick) <= TickEncoder.encode(b.tick) ? -1 : 1,
       );
 
-      /* Find best score with highest amount at lowest cost */
-      const bestScore = scores.reduce(
-        (bestScore, score) =>
-          score.available > bestScore.available ||
-          (score.available == bestScore.available && score.cost < bestScore.cost)
-            ? score
-            : bestScore,
-        scores[0],
-      );
+      /* Pick best scoring node */
+      const bestNode = availableNodes[0];
 
-      /* Update cumulative amount and route along best score node */
-      amount += minBigInt(bestScore.node.tick.limit * BigInt(multiplier) - amount, bestScore.node.available);
-      route.push(bestScore.node);
+      /* Update cumulative amount and route */
+      amount += minBigInt(bestNode.tick.limit * BigInt(multiplier) - amount, bestNode.available);
+      route.push(bestNode);
     }
 
     return { amount, route };
@@ -163,11 +126,8 @@ export class TickRouter {
    * @returns Liquidity available
    */
   forecast(nodes: LiquidityNode[], duration: number, multiplier: number = 1, numNodes: number = 10): bigint {
-    /* Decode, filter, aggregate, and traverse nodes for maximum amount along best route */
-    const { amount, route } = this._traverseNodes(
-      this._aggregateNodes(this._filterNodes(this._decodeNodes(nodes), duration)),
-      multiplier,
-    );
+    /* Decode, filter, and traverse nodes for maximum amount along best route */
+    const { amount, route } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
 
     /* Prune the route */
     const prunedRoute = this._pruneNodes(route, amount);
@@ -195,11 +155,8 @@ export class TickRouter {
     multiplier: number = 1,
     numNodes: number = 10,
   ): EncodedTick[] {
-    /* Decode, filter, aggregate, and traverse nodes for maximum amount along best route */
-    const { route, ..._ } = this._traverseNodes(
-      this._aggregateNodes(this._filterNodes(this._decodeNodes(nodes), duration)),
-      multiplier,
-    );
+    /* Decode, filter, and traverse nodes for maximum amount along best route */
+    const { route, ..._ } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
 
     /* Prune the route */
     const prunedRoute = this._pruneNodes(route, amount);
