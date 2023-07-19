@@ -154,20 +154,24 @@ describe('TickRouter', function () {
   it('#_pruneNodes', function () {
     expect(router._sourceNodes(router._decodeNodes(TEST_NODES_4), 999999n, 1)[0]).toEqual(354n);
 
-    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n)).toEqual([
-      { tick: { limit: 50n, duration: 0, rate: 0, reserved: 0n }, available: 100n },
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 3)).toEqual([
       { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
     ]);
-  });
 
-  it('#_limitNodes', function () {
-    expect(router._limitNodes(router._decodeNodes(TEST_NODES_1), 4)).toEqual([
-      { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
-      { tick: { limit: 50n, duration: 2, rate: 1, reserved: 0n }, available: 200n },
-      { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
-      { tick: { limit: 100n, duration: 1, rate: 2, reserved: 0n }, available: 100n },
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 3)).toEqual([
+      { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
+      { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
+      { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
+    ]);
+
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 5)).toEqual([
+      { tick: { limit: 50n, duration: 0, rate: 0, reserved: 0n }, available: 100n },
+      { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
+      { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
+      { tick: { limit: 350n, duration: 0, rate: 2, reserved: 0n }, available: 1n },
+      { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
     ]);
   });
 
@@ -189,8 +193,8 @@ describe('TickRouter', function () {
     expect(router.forecast(TEST_NODES_1, 35 * 86400, 3)).toEqual(0n);
 
     /* Nodes with dust */
-    expect(router.forecast(TEST_NODES_4, 3 * 86400, 1)).toEqual(350n);
-    expect(router.forecast(TEST_NODES_4, 3 * 86400, 3)).toEqual(400n);
+    expect(router.forecast(TEST_NODES_4, 3 * 86400, 1)).toEqual(354n);
+    expect(router.forecast(TEST_NODES_4, 3 * 86400, 3)).toEqual(404n);
 
     /* Nodes with dust, with reduced number of nodes */
     expect(router.forecast(TEST_NODES_4, 3 * 86400, 1, 3)).toEqual(300n);
@@ -242,22 +246,30 @@ describe('TickRouter', function () {
     /* Nodes with dust */
     expect(router.route(TEST_NODES_4, 350n, 3 * 86400, 1)).toEqual([
       TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
+      TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
+      TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
       TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
+      TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
       TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+      TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
       TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
     ]);
     expect(router.route(TEST_NODES_4, 400n, 3 * 86400, 3)).toEqual([
       TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
+      TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
+      TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
       TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
+      TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
       TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+      TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
       TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
     ]);
 
     /* Nodes with dust, with reduced number of nodes */
-    expect(router.route(TEST_NODES_4, 300n, 3 * 86400, 1, 3)).toEqual([
+    expect(router.route(TEST_NODES_4, 250n, 3 * 86400, 1, 3)).toEqual([
+      TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
       TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
       TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
     ]);
   });
 
