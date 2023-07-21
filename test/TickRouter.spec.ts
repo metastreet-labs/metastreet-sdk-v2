@@ -168,9 +168,9 @@ describe('TickRouter', function () {
 
     expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 5)).toEqual([
       { tick: { limit: 50n, duration: 0, rate: 0, reserved: 0n }, available: 100n },
+      { tick: { limit: 100n, duration: 0, rate: 0, reserved: 0n }, available: 1n },
       { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
-      { tick: { limit: 350n, duration: 0, rate: 2, reserved: 0n }, available: 1n },
       { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
     ]);
   });

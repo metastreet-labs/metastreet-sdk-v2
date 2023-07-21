@@ -93,7 +93,7 @@ export class TickRouter {
 
     /* Sort node indices by contribution */
     const sortedIndices = [...Array(sources.length).keys()].sort((i: number, j: number): number =>
-      sources[i] > sources[j] ? -1 : sources[i] < sources[j] ? 1 : i > j ? -1 : 1,
+      sources[i] > sources[j] ? -1 : sources[i] < sources[j] ? 1 : nodes[i].tick.rate < nodes[i].tick.rate ? -1 : 1,
     );
 
     /* Limit node indices to count and sort indices for ascending ticks */
