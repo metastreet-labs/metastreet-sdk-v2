@@ -102,7 +102,7 @@ export class TickRouter {
     );
 
     /* Limit node indices to count and sort indices for ascending ticks */
-    const limitedSortedIndices = sortedIndices.slice(0, count).sort();
+    const limitedSortedIndices = sortedIndices.slice(0, count).sort((i: number, j: number): number => i - j);
 
     /* Map limited, sorted node indices back to nodes */
     return limitedSortedIndices.map((i) => nodes[i]);
