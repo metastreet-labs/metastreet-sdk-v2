@@ -87,14 +87,9 @@ export class TickRouter {
     return { amount, route };
   }
 
-  _pruneNodes(
-    nodes: DecodedLiquidityNode[],
-    amount: bigint,
-    multiplier: number,
-    count: number,
-  ): DecodedLiquidityNode[] {
+  _pruneNodes(nodes: DecodedLiquidityNode[], multiplier: number, count: number): DecodedLiquidityNode[] {
     /* Source liquidity from all nodes */
-    const [_, sources] = this._sourceNodes(nodes, amount, multiplier);
+    const [_, sources] = this._sourceNodes(nodes, 2n ** 120n - 1n, multiplier);
 
     /* Sort node indices by contribution */
     const sortedIndices = [...Array(sources.length).keys()].sort((i: number, j: number): number =>
@@ -140,10 +135,10 @@ export class TickRouter {
    */
   forecast(nodes: LiquidityNode[], duration: number, multiplier: number = 1, numNodes: number = 10): bigint {
     /* Decode, filter, and traverse nodes for maximum amount along best route */
-    const { amount, route } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
+    const { route, ..._ } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
 
     /* Limit nodes in route */
-    const prunedRoute = this._pruneNodes(route, amount, multiplier, numNodes);
+    const prunedRoute = this._pruneNodes(route, multiplier, numNodes);
 
     /* Source maximum liquidity from nodes */
     return this._sourceNodes(prunedRoute, 2n ** 120n - 1n, multiplier)[0];
@@ -169,7 +164,7 @@ export class TickRouter {
     const { route, ..._ } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
 
     /* Limit nodes in route */
-    const prunedRoute = this._pruneNodes(route, amount, multiplier, numNodes);
+    const prunedRoute = this._pruneNodes(route, multiplier, numNodes);
 
     /* Source liquidity from nodes */
     const [total, sources] = this._sourceNodes(prunedRoute, amount, multiplier);

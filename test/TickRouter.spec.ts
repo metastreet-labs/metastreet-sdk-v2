@@ -154,19 +154,19 @@ describe('TickRouter', function () {
   it('#_pruneNodes', function () {
     expect(router._sourceNodes(router._decodeNodes(TEST_NODES_4), 999999n, 1)[0]).toEqual(354n);
 
-    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 3)).toEqual([
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 3)).toEqual([
       { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
     ]);
 
-    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 3)).toEqual([
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 3)).toEqual([
       { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 400n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
     ]);
 
-    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 354n, 1, 5)).toEqual([
+    expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 5)).toEqual([
       { tick: { limit: 50n, duration: 0, rate: 0, reserved: 0n }, available: 100n },
       { tick: { limit: 200n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
       { tick: { limit: 300n, duration: 0, rate: 2, reserved: 0n }, available: 100n },
@@ -292,11 +292,11 @@ describe('TickRouter', function () {
     /* Nodes with dust, with reduced number of nodes */
     expect(router.route(TEST_NODES_4, 250n, 3 * 86400, 1, 3)).toEqual([
       [
-        TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
         TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
         TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
       ],
-      [50n, 100n, 100n],
+      [100n, 100n, 50n],
     ]);
   });
 
