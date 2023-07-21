@@ -156,7 +156,7 @@ export class TickRouter {
    * @param duration Duration in seconds
    * @param multiplier Multiplier in amount
    * @param numNodes Number of liquidity nodes to use (maximum)
-   * @returns Encoded ticks
+   * @returns Encoded ticks and sourced amounts
    */
   route(
     nodes: LiquidityNode[],
@@ -164,19 +164,22 @@ export class TickRouter {
     duration: number,
     multiplier: number = 1,
     numNodes: number = 10,
-  ): EncodedTick[] {
+  ): [EncodedTick[], bigint[]] {
     /* Decode, filter, and traverse nodes for maximum amount along best route */
     const { route, ..._ } = this._traverseNodes(this._filterNodes(this._decodeNodes(nodes), duration), multiplier);
 
     /* Limit nodes in route */
     const prunedRoute = this._pruneNodes(route, amount, multiplier, numNodes);
 
+    /* Source liquidity from nodes */
+    const [total, sources] = this._sourceNodes(prunedRoute, amount, multiplier);
+
     /* Check sufficient liquidity is available in pruned route */
-    if (this._sourceNodes(prunedRoute, amount, multiplier)[0] != amount) {
+    if (total != amount) {
       throw new Error(`Insufficient liquidity for ${amount} amount.`);
     }
 
-    return prunedRoute.map((n) => TickEncoder.encode(n.tick));
+    return [prunedRoute.map((n) => TickEncoder.encode(n.tick)), sources];
   }
 
   /**

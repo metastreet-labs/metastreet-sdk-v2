@@ -204,84 +204,111 @@ describe('TickRouter', function () {
   it('#route', function () {
     /* 3 days */
     expect(router.route(TEST_NODES_1, 100n, 3 * 86400, 1)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 0, rate: 1 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 0, rate: 1 }),
+      ],
+      [25n, 25n, 50n],
     ]);
     expect(router.route(TEST_NODES_1, 300n, 3 * 86400, 3)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 0, rate: 1 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 0, rate: 1 }),
+      ],
+      [75n, 75n, 150n],
     ]);
 
     /* 10 days */
     expect(router.route(TEST_NODES_1, 100n, 10 * 86400, 1)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 1, rate: 2 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 1, rate: 2 }),
+      ],
+      [25n, 25n, 50n],
     ]);
     expect(router.route(TEST_NODES_1, 250n, 10 * 86400, 3)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 1, rate: 2 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 1, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 1, rate: 2 }),
+      ],
+      [75n, 75n, 100n],
     ]);
 
     /* 30 days */
     expect(router.route(TEST_NODES_1, 50n, 30 * 86400, 1)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 2, rate: 1 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 2, rate: 1 }),
+      ],
+      [25n, 25n],
     ]);
     expect(router.route(TEST_NODES_1, 100n, 30 * 86400, 3)).toEqual([
-      TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
-      TickEncoder.encode({ limit: 50n, duration: 2, rate: 1 }),
+      [
+        TickEncoder.encode({ limit: 25n, duration: 2, rate: 0 }),
+        TickEncoder.encode({ limit: 50n, duration: 2, rate: 1 }),
+      ],
+      [75n, 25n],
     ]);
 
     /* 30 days, over available */
     expect(() => router.route(TEST_NODES_1, 51n, 30 * 86400, 1)).toThrow(/Insufficient liquidity/);
 
     /* 35 days */
-    expect(router.route(TEST_NODES_1, 0n, 35 * 86400, 1)).toEqual([]);
+    expect(router.route(TEST_NODES_1, 0n, 35 * 86400, 1)).toEqual([[], []]);
     expect(() => router.route(TEST_NODES_1, 1n, 35 * 86400, 1)).toThrow(/Insufficient liquidity/);
 
     /* Nodes with dust */
     expect(router.route(TEST_NODES_4, 350n, 3 * 86400, 1)).toEqual([
-      TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
-      TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
-      TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
-      TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
+      [
+        TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
+        TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
+        TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
+        TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
+      ],
+      [50n, 1n, 1n, 100n, 1n, 100n, 1n, 96n],
     ]);
     expect(router.route(TEST_NODES_4, 400n, 3 * 86400, 3)).toEqual([
-      TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
-      TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
-      TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
-      TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
-      TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
+      [
+        TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
+        TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }),
+        TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }),
+        TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }),
+        TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }),
+      ],
+      [100n, 1n, 1n, 100n, 1n, 100n, 1n, 96n],
     ]);
 
     /* Nodes with dust, with reduced number of nodes */
     expect(router.route(TEST_NODES_4, 250n, 3 * 86400, 1, 3)).toEqual([
-      TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
-      TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
-      TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+      [
+        TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }),
+        TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
+        TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
+      ],
+      [50n, 100n, 100n],
     ]);
   });
 
   it('#quote', function () {
-    const ticks1 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 1);
+    const ticks1 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 1)[0];
     expect(router.quote(TEST_NODES_5, [], 0n, 3 * 86400, 1)).toEqual(0n);
     expect(router.quote(TEST_NODES_5, ticks1, 0n, 3 * 86400, 1)).toEqual(0n);
     expect(router.quote(TEST_NODES_5, ticks1, 200n * 10n ** 18n, 3 * 86400, 1)).toEqual(200410958904060800000n);
     expect(() => router.quote(TEST_NODES_5, [], 200n * 10n ** 18n, 3 * 86400, 1)).toThrow(/Insufficient liquidity/);
     expect(() => router.quote(TEST_NODES_5, ticks1, 300n * 10n ** 18n, 3 * 86400, 1)).toThrow(/Insufficient liquidity/);
 
-    const ticks2 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 3);
+    const ticks2 = router.route(TEST_NODES_5, 200n * 10n ** 18n, 3 * 86400, 3)[0];
     expect(router.quote(TEST_NODES_5, ticks2, 550n * 10n ** 18n, 3 * 86400, 3)).toEqual(551027397260216800000n);
   });
 });
