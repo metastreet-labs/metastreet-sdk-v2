@@ -175,6 +175,20 @@ describe('TickRouter', function () {
     ]);
   });
 
+  it.only('#merge', function () {
+    expect(router.merge(TEST_NODES_3, TEST_NODES_4)).toEqual([
+      { tick: TickEncoder.encode({ limit: 0n, duration: 0, rate: 0 }), available: 0n },
+      { tick: TickEncoder.encode({ limit: 50n, duration: 0, rate: 0 }), available: 1100n },
+      { tick: TickEncoder.encode({ limit: 100n, duration: 0, rate: 0 }), available: 501n },
+      { tick: TickEncoder.encode({ limit: 150n, duration: 0, rate: 1 }), available: 251n },
+      { tick: TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }), available: 200n },
+      { tick: TickEncoder.encode({ limit: 250n, duration: 0, rate: 1 }), available: 1n },
+      { tick: TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }), available: 100n },
+      { tick: TickEncoder.encode({ limit: 350n, duration: 0, rate: 2 }), available: 1n },
+      { tick: TickEncoder.encode({ limit: 400n, duration: 0, rate: 2 }), available: 100n },
+    ]);
+  });
+
   it('#forecast', function () {
     /* 3 days */
     expect(router.forecast(TEST_NODES_1, 3 * 86400, 1)).toEqual(100n);

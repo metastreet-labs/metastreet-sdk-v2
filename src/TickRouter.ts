@@ -126,6 +126,23 @@ export class TickRouter {
   /****************************************************************************/
 
   /**
+   * Merge liquidity nodes (used to forecast liquidity for a refinance).
+   * @param nodes1 First liquidity nodes
+   * @param nodes2 Second liquidity nodes
+   * @return Merged liquidity nodes
+   */
+  merge(nodes1: LiquidityNode[], nodes2: LiquidityNode[]): LiquidityNode[] {
+    return nodes1
+      .concat(nodes2)
+      .sort((a: LiquidityNode, b: LiquidityNode) => (a.tick < b.tick ? -1 : 1))
+      .reduce((acc: LiquidityNode[], n: LiquidityNode) => {
+        if (acc.length > 0 && acc[acc.length - 1].tick == n.tick) acc[acc.length - 1].available += n.available;
+        else acc.push({ tick: n.tick, available: n.available });
+        return acc;
+      }, []);
+  }
+
+  /**
    * Forecast liquidity available.
    * @param nodes Liquidity nodes
    * @param duration Duration in seconds
