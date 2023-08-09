@@ -3,6 +3,17 @@ import { EncodedTick, DecodedTick, TickEncoder } from './Tick';
 export interface LiquidityNode {
   tick: EncodedTick;
   available: bigint;
+
+  /* Additional fields needed to process redemptions in apply() */
+  value?: bigint;
+  shares?: bigint;
+  redemptions?: bigint;
+}
+
+export interface NodeReceipt {
+  tick: EncodedTick;
+  used: bigint;
+  pending: bigint;
 }
 
 interface DecodedLiquidityNode {
@@ -126,20 +137,68 @@ export class TickRouter {
   /****************************************************************************/
 
   /**
-   * Merge liquidity nodes (used to forecast liquidity for a refinance).
-   * @param nodes1 First liquidity nodes
-   * @param nodes2 Second liquidity nodes
-   * @return Merged liquidity nodes
+   * Apply repaid node receipts to liquidity nodes (used to forecast liquidity for a refinance).
+   * @param existing Existing liquidity nodes, with additional value, shares,
+   *                 and pending redemptions fields
+   * @param receipts Repaid node receipts
+   * @param proration Proration of repayment as a fraction from 0.0 to 1.0
+   * @return Repaid liquidity nodes
    */
-  merge(nodes1: LiquidityNode[], nodes2: LiquidityNode[]): LiquidityNode[] {
-    return nodes1
-      .concat(nodes2)
+  apply(nodes: LiquidityNode[], receipts: NodeReceipt[], proration: number): LiquidityNode[] {
+    /* Transform node receipts into repaid liquidity nodes with proration applied */
+    const repaid: LiquidityNode[] = receipts.map((receipt) => {
+      const restored =
+        receipt.used + ((receipt.pending - receipt.used) * BigInt(proration * 1e18)) / this.FIXED_POINT_SCALE;
+      return { tick: receipt.tick, available: restored, value: restored, shares: 0n, redemptions: 0n };
+    });
+
+    /* Merge repaid nodes with existing nodes */
+    const merged = nodes
+      .concat(repaid)
       .sort((a: LiquidityNode, b: LiquidityNode) => (a.tick < b.tick ? -1 : 1))
       .reduce((acc: LiquidityNode[], n: LiquidityNode) => {
-        if (acc.length > 0 && acc[acc.length - 1].tick == n.tick) acc[acc.length - 1].available += n.available;
-        else acc.push({ tick: n.tick, available: n.available });
+        if (acc.length > 0 && acc[acc.length - 1].tick == n.tick) {
+          acc[acc.length - 1].available += n.available;
+          acc[acc.length - 1].value = (acc[acc.length - 1].value ?? 0n) + (n.value ?? 0n);
+          acc[acc.length - 1].shares = (acc[acc.length - 1].shares ?? 0n) + (n.shares ?? 0n);
+          acc[acc.length - 1].redemptions = (acc[acc.length - 1].redemptions ?? 0n) + (n.redemptions ?? 0n);
+        } else {
+          if (n.value === undefined || n.shares === undefined || n.redemptions === undefined) {
+            throw new Error(`Missing required fields in liquidity node with tick ${n.tick}`);
+          }
+          acc.push({
+            tick: n.tick,
+            available: n.available,
+            value: n.value,
+            shares: n.shares,
+            redemptions: n.redemptions,
+          });
+        }
         return acc;
       }, []);
+
+    /* Process redemptions in merged repaid nodes */
+    return merged.map((node) => {
+      if (
+        node.redemptions === 0n ||
+        node.available === 0n ||
+        node.value === undefined ||
+        node.shares === undefined ||
+        node.redemptions === undefined
+      ) {
+        return { tick: node.tick, available: node.available };
+      }
+
+      /* Compute redemption price, redeemd shares, and redeemed amount */
+      const price = (node.value * this.FIXED_POINT_SCALE) / node.shares;
+      const shares =
+        price === 0n
+          ? node.redemptions
+          : minBigInt((node.available * this.FIXED_POINT_SCALE) / price, node.redemptions);
+      const amount = (shares * price) / this.FIXED_POINT_SCALE;
+
+      return { tick: node.tick, available: node.available - amount };
+    });
   }
 
   /**
