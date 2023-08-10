@@ -114,10 +114,6 @@ export class TickRouter {
     return limitedSortedIndices.map((i) => nodes[i]);
   }
 
-  _limitNodes(nodes: DecodedLiquidityNode[], count: number): DecodedLiquidityNode[] {
-    return nodes.splice(-count);
-  }
-
   _sourceNodes(nodes: DecodedLiquidityNode[], amount: bigint, multiplier: number): [bigint, bigint[]] {
     /* Source as much liquidity from nodes as possible, up to the limit, amount
      * available, and amount remaining */
