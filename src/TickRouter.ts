@@ -138,8 +138,8 @@ export class TickRouter {
 
   /**
    * Apply repaid node receipts to liquidity nodes (used to forecast liquidity for a refinance).
-   * @param existing Existing liquidity nodes, with additional value, shares,
-   *                 and pending redemptions fields
+   * @param nodes Existing liquidity nodes, with additional value, shares, and
+   *              pending redemptions fields
    * @param receipts Repaid node receipts
    * @param proration Proration of repayment as a fraction from 0.0 to 1.0
    * @return Repaid liquidity nodes
