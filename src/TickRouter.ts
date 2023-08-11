@@ -144,7 +144,8 @@ export class TickRouter {
     /* Transform node receipts into repaid liquidity nodes with proration applied */
     const repaid: LiquidityNode[] = receipts.map((receipt) => {
       const restored =
-        receipt.used + ((receipt.pending - receipt.used) * BigInt(proration * 1e18)) / this.FIXED_POINT_SCALE;
+        receipt.used +
+        ((receipt.pending - receipt.used) * BigInt(Math.floor(proration * 1e18))) / this.FIXED_POINT_SCALE;
       return { tick: receipt.tick, available: restored, value: restored, shares: 0n, redemptions: 0n };
     });
 
