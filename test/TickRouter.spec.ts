@@ -122,7 +122,7 @@ describe('TickRouter', function () {
     ]);
   });
 
-  it('#_filterNodes', function () {
+  it('#_filterNodes (ascending duration)', function () {
     const nodes = router._decodeNodes(TEST_NODES_1);
 
     /* 3 days */
@@ -148,6 +148,43 @@ describe('TickRouter', function () {
     expect(router._filterNodes(nodes, 30 * 86400)).toEqual([
       { tick: { limit: 25n, duration: 2, rate: 0, reserved: 0n }, available: 500n },
       { tick: { limit: 50n, duration: 2, rate: 1, reserved: 0n }, available: 200n },
+    ]);
+
+    /* 35 days */
+    expect(router._filterNodes(nodes, 35 * 86400)).toEqual([]);
+  });
+
+  it('#_filterNodes (descending duration)', function () {
+    /* Reverse durations */
+    router = new TickRouter([30 * 86400, 14 * 86400, 7 * 86400], [3170979198n, 9512937595n, 15854895991n]);
+
+    const nodes = router._decodeNodes(TEST_NODES_1);
+
+    /* 3 days */
+    expect(router._filterNodes(nodes, 3 * 86400)).toEqual([
+      { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
+      { tick: { limit: 25n, duration: 2, rate: 0, reserved: 0n }, available: 500n },
+      { tick: { limit: 50n, duration: 0, rate: 2, reserved: 0n }, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
+      { tick: { limit: 50n, duration: 2, rate: 1, reserved: 0n }, available: 200n },
+      { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, reserved: 0n }, available: 100n },
+    ]);
+
+    /* 10 days */
+    expect(router._filterNodes(nodes, 10 * 86400)).toEqual([
+      { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
+      { tick: { limit: 50n, duration: 0, rate: 2, reserved: 0n }, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, reserved: 0n }, available: 250n },
+      { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, reserved: 0n }, available: 100n },
+    ]);
+
+    /* 30 days */
+    expect(router._filterNodes(nodes, 30 * 86400)).toEqual([
+      { tick: { limit: 0n, duration: 0, rate: 0, reserved: 0n }, available: 0n },
+      { tick: { limit: 50n, duration: 0, rate: 2, reserved: 0n }, available: 0n },
+      { tick: { limit: 100n, duration: 0, rate: 1, reserved: 0n }, available: 150n },
     ]);
 
     /* 35 days */

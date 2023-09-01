@@ -38,7 +38,7 @@ export class TickRouter {
 
   /**
    * Constructor
-   * @param durations Durations in seconds (ascending)
+   * @param durations Durations in seconds (ascending for v1, descending for v2)
    * @param rates Rates in interest per second (ascending)
    */
   constructor(durations: number[], rates: bigint[]) {
@@ -56,12 +56,22 @@ export class TickRouter {
   }
 
   _filterNodes(nodes: DecodedLiquidityNode[], duration: number): DecodedLiquidityNode[] {
-    /* Map duration to duration index */
-    let durationIndex = this.durations.findIndex((d) => duration <= d);
-    durationIndex = durationIndex == -1 ? Infinity : durationIndex;
+    /* Handle descending (v2) vs ascending (v1) durations */
+    if (this.durations[0] > this.durations[1]) {
+      /* Map duration to duration index */
+      let durationIndex = [...this.durations].reverse().findIndex((d) => duration <= d);
+      durationIndex = durationIndex == -1 ? -Infinity : this.durations.length - 1 - durationIndex;
 
-    /* Filter out nodes with durations exceeding input duration */
-    return nodes.filter((n) => n.tick.duration >= durationIndex);
+      /* Filter out nodes with durations exceeding input duration */
+      return nodes.filter((n) => n.tick.duration <= durationIndex);
+    } else {
+      /* Map duration to duration index */
+      let durationIndex = this.durations.findIndex((d) => duration <= d);
+      durationIndex = durationIndex == -1 ? Infinity : durationIndex;
+
+      /* Filter out nodes with durations exceeding input duration */
+      return nodes.filter((n) => n.tick.duration >= durationIndex);
+    }
   }
 
   _traverseNodes(nodes: DecodedLiquidityNode[], multiplier: number): { amount: bigint; route: DecodedLiquidityNode[] } {
