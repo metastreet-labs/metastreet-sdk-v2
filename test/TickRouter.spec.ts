@@ -112,13 +112,13 @@ describe('TickRouter', function () {
 
   it('#_decodeNodes', function () {
     expect(router._decodeNodes(TEST_NODES_1)).toEqual([
-      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, available: 200n },
-      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
-      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
+      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 50n, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, limit: 50n, available: 200n },
+      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, limit: 100n, available: 100n },
     ]);
   });
 
@@ -127,27 +127,27 @@ describe('TickRouter', function () {
 
     /* 3 days */
     expect(router._filterNodes(nodes, 3 * 86400)).toEqual([
-      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, available: 200n },
-      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
-      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
+      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 50n, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, limit: 50n, available: 200n },
+      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, limit: 100n, available: 100n },
     ]);
 
     /* 10 days */
     expect(router._filterNodes(nodes, 10 * 86400)).toEqual([
-      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, available: 200n },
-      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, limit: 50n, available: 200n },
+      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, limit: 100n, available: 100n },
     ]);
 
     /* 30 days */
     expect(router._filterNodes(nodes, 30 * 86400)).toEqual([
-      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, available: 200n },
+      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, limit: 50n, available: 200n },
     ]);
 
     /* 35 days */
@@ -162,29 +162,29 @@ describe('TickRouter', function () {
 
     /* 3 days */
     expect(router._filterNodes(nodes, 3 * 86400)).toEqual([
-      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, available: 200n },
-      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
-      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
+      { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 50n, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+      { tick: { limit: 50n, duration: 2, rate: 1, limitType: LimitType.Absolute }, limit: 50n, available: 200n },
+      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, limit: 100n, available: 100n },
     ]);
 
     /* 10 days */
     expect(router._filterNodes(nodes, 10 * 86400)).toEqual([
-      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
-      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
+      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 50n, available: 0n },
+      { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
+      { tick: { limit: 100n, duration: 1, rate: 2, limitType: LimitType.Absolute }, limit: 100n, available: 100n },
     ]);
 
     /* 30 days */
     expect(router._filterNodes(nodes, 30 * 86400)).toEqual([
-      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 0n },
-      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
+      { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
+      { tick: { limit: 50n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 50n, available: 0n },
+      { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
     ]);
 
     /* 35 days */
@@ -195,31 +195,31 @@ describe('TickRouter', function () {
     expect(router._traverseNodes(router._decodeNodes(TEST_NODES_1), 1)).toEqual({
       amount: 100n,
       route: [
-        { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-        { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-        { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
+        { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+        { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+        { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
       ],
     });
 
     expect(router._traverseNodes(router._decodeNodes(TEST_NODES_1), 3)).toEqual({
       amount: 300n,
       route: [
-        { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, available: 500n },
-        { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, available: 250n },
-        { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 150n },
+        { tick: { limit: 25n, duration: 2, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 500n },
+        { tick: { limit: 50n, duration: 1, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 250n },
+        { tick: { limit: 100n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 100n, available: 150n },
       ],
     });
 
     expect(router._traverseNodes(router._decodeNodes(TEST_NODES_2), 1)).toEqual({
       amount: 25n,
       route: [
-        { tick: { limit: 5n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 5n },
-        { tick: { limit: 10n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 1n },
-        { tick: { limit: 10n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 4n },
-        { tick: { limit: 15n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 10n },
-        { tick: { limit: 20n, duration: 0, rate: 1, limitType: LimitType.Absolute }, available: 4n },
-        { tick: { limit: 20n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 1n },
-        { tick: { limit: 25n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 5n },
+        { tick: { limit: 5n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 5n, available: 5n },
+        { tick: { limit: 10n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 10n, available: 1n },
+        { tick: { limit: 10n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 10n, available: 4n },
+        { tick: { limit: 15n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 15n, available: 10n },
+        { tick: { limit: 20n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 20n, available: 4n },
+        { tick: { limit: 20n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 20n, available: 1n },
+        { tick: { limit: 25n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 5n },
       ],
     });
   });
@@ -244,23 +244,23 @@ describe('TickRouter', function () {
     expect(router._sourceNodes(router._decodeNodes(TEST_NODES_4), 999999n, 1)[0]).toEqual(354n);
 
     expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 3)).toEqual([
-      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 200n, available: 100n },
+      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 300n, available: 100n },
+      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 400n, available: 100n },
     ]);
 
     expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 3)).toEqual([
-      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 200n, available: 100n },
+      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 300n, available: 100n },
+      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 400n, available: 100n },
     ]);
 
     expect(router._pruneNodes(router._decodeNodes(TEST_NODES_4), 1, 5)).toEqual([
-      { tick: { limit: 50n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 100n, duration: 0, rate: 0, limitType: LimitType.Absolute }, available: 1n },
-      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
-      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, available: 100n },
+      { tick: { limit: 50n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 50n, available: 100n },
+      { tick: { limit: 100n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 100n, available: 1n },
+      { tick: { limit: 200n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 200n, available: 100n },
+      { tick: { limit: 300n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 300n, available: 100n },
+      { tick: { limit: 400n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 400n, available: 100n },
     ]);
   });
 
@@ -315,8 +315,8 @@ describe('TickRouter', function () {
     expect(router.forecast(TEST_NODES_4, 3 * 86400, 3)).toEqual(404n);
 
     /* Nodes with dust, with reduced number of nodes */
-    expect(router.forecast(TEST_NODES_4, 3 * 86400, 1, 3)).toEqual(300n);
-    expect(router.forecast(TEST_NODES_4, 3 * 86400, 3, 3)).toEqual(300n);
+    expect(router.forecast(TEST_NODES_4, 3 * 86400, 1, undefined, 3)).toEqual(300n);
+    expect(router.forecast(TEST_NODES_4, 3 * 86400, 3, undefined, 3)).toEqual(300n);
   });
 
   it('#route', function () {
@@ -408,7 +408,7 @@ describe('TickRouter', function () {
     ]);
 
     /* Nodes with dust, with reduced number of nodes */
-    expect(router.route(TEST_NODES_4, 250n, 3 * 86400, 1, 3)).toEqual([
+    expect(router.route(TEST_NODES_4, 250n, 3 * 86400, 1, undefined, 3)).toEqual([
       [
         TickEncoder.encode({ limit: 200n, duration: 0, rate: 2 }),
         TickEncoder.encode({ limit: 300n, duration: 0, rate: 2 }),
