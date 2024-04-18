@@ -33,6 +33,9 @@ export class TickRouter {
   /* Fixed point scale */
   readonly FIXED_POINT_SCALE = 10n ** 18n;
 
+  /* Basis points scale */
+  readonly BASIS_POINTS_SCALE = 10000n;
+
   /****************************************************************************/
   /* Constructor */
   /****************************************************************************/
@@ -56,7 +59,7 @@ export class TickRouter {
     return nodes.map((n) => {
       const tick = TickEncoder.decode(n.tick);
       const limit =
-        tick.limitType === LimitType.Absolute ? tick.limit : (tick.limit * collateralValue) / this.FIXED_POINT_SCALE;
+        tick.limitType === LimitType.Absolute ? tick.limit : (tick.limit * collateralValue) / this.BASIS_POINTS_SCALE;
       const available = n.available;
       return { tick, limit, available };
     });
