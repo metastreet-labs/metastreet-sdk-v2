@@ -1,4 +1,11 @@
-import { Address, PrivateKeyAccount, TypedDataDomain, parseAbiParameters, encodeAbiParameters } from 'viem';
+import {
+  Address,
+  PrivateKeyAccount,
+  TypedDataDomain,
+  parseAbiParameters,
+  encodeAbiParameters,
+  decodeAbiParameters,
+} from 'viem';
 
 export interface Quote {
   token: Address;
@@ -82,5 +89,19 @@ export class QuoteHelper {
       ),
       [signedQuotes],
     );
+  }
+
+  /**
+   * Decode an oracle context payload into signed quotes.
+   * @param oracleContext Oracle context
+   * @return Signed quotes
+   */
+  static decodeQuotes(oracleContext: `0x${string}`): readonly SignedQuote[] {
+    return decodeAbiParameters(
+      parseAbiParameters(
+        '((address token,uint256 tokenId,address currency,uint256 price,uint64 timestamp,uint64 duration) quote,bytes signature)[]',
+      ),
+      oracleContext,
+    )[0];
   }
 }
