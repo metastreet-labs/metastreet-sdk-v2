@@ -23,7 +23,7 @@ const TEST_DOMAIN: TypedDataDomain = {
 };
 
 async function main() {
-  const timestamp = Math.floor((new Date()).getTime() / 1000);
+  const timestamp = Math.floor(new Date().getTime() / 1000);
 
   console.log('Signing price quote for WPUNKS #1234 @ 40 WETH with expiry in 1800 seconds:');
 
