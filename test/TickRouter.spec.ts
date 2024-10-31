@@ -75,6 +75,14 @@ const TEST_NODES_6: LiquidityNode[] = [
   },
 ];
 
+const TEST_NODES_7: LiquidityNode[] = [
+  { tick: TickEncoder.encode({ limit: 0n, duration: 0, rate: 0 }), available: 0n },
+  { tick: TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 1 }), available: 1000n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 1, rate: 0 }), available: 1000n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 100n * 10n ** 18n, duration: 0, rate: 0 }), available: 500n * 10n ** 18n },
+  { tick: TickEncoder.encode({ limit: 200n * 10n ** 18n, duration: 0, rate: 2 }), available: 100n * 10n ** 18n },
+];
+
 const TEST_NODE_RECEIPTS_1: NodeReceipt[] = [
   {
     tick: TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 0 }),
@@ -220,6 +228,27 @@ describe('TickRouter', function () {
         { tick: { limit: 20n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 20n, available: 4n },
         { tick: { limit: 20n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 20n, available: 1n },
         { tick: { limit: 25n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 5n },
+      ],
+    });
+
+    expect(router._traverseNodes(router._decodeNodes(TEST_NODES_7), 1)).toEqual({
+      amount: 200n * 10n ** 18n,
+      route: [
+        {
+          tick: { limit: 50n * 10n ** 18n, duration: 1, rate: 0, limitType: LimitType.Absolute },
+          limit: 50n * 10n ** 18n,
+          available: 1000n * 10n ** 18n,
+        },
+        {
+          tick: { limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute },
+          limit: 100n * 10n ** 18n,
+          available: 500n * 10n ** 18n,
+        },
+        {
+          tick: { limit: 200n * 10n ** 18n, duration: 0, rate: 2, limitType: LimitType.Absolute },
+          limit: 200n * 10n ** 18n,
+          available: 100n * 10n ** 18n,
+        },
       ],
     });
   });

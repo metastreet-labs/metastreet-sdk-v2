@@ -105,9 +105,23 @@ export class TickRouter {
       /* If no nodes are available, break */
       if (availableNodes.length === 0) break;
 
-      /* Sort nodes by cost of capital and duration */
+      /* Sort nodes by 1) limit (increasing), 2) rate (increasing), 3) duration
+       * (decreasing), 4) limit type (absolute before ratio). This assumes that
+       * ticks with lower limits will have lower rates. */
       availableNodes.sort((a: DecodedLiquidityNode, b: DecodedLiquidityNode): number =>
-        TickEncoder.encode({ ...a.tick, limit: a.limit }) <= TickEncoder.encode({ ...b.tick, limit: b.limit }) ? -1 : 1,
+        a.limit < b.limit
+          ? -1
+          : a.limit > b.limit
+          ? 1
+          : a.tick.rate < b.tick.rate
+          ? -1
+          : a.tick.rate > b.tick.rate
+          ? 1
+          : a.tick.duration < b.tick.duration
+          ? -1
+          : (a.tick.limitType ?? 0) < (b.tick.limitType ?? 0)
+          ? -1
+          : 1,
       );
 
       /* Pick best scoring node */
