@@ -22,6 +22,10 @@ interface DecodedLiquidityNode {
   available: bigint;
 }
 
+function nodeGreaterThan(a: DecodedLiquidityNode, b: DecodedLiquidityNode): boolean {
+  return TickEncoder.encode({ ...a.tick, limit: a.limit }) > TickEncoder.encode({ ...b.tick, limit: b.limit });
+}
+
 function minBigInt(a: bigint, b: bigint): bigint {
   return a < b ? a : b;
 }
@@ -140,19 +144,14 @@ export class TickRouter {
     const [_, sources] = this._sourceNodes(nodes, 2n ** 120n - 1n, multiplier);
 
     /* Sort node indices by contribution */
-    const sortedIndices = [...Array(sources.length).keys()].sort((i: number, j: number): number =>
+    const sortedIndices = [...Array(sources.length).keys()].sort((i, j): number =>
       sources[i] > sources[j] ? -1 : sources[i] < sources[j] ? 1 : nodes[i].tick.rate < nodes[i].tick.rate ? -1 : 1,
     );
 
-    /* Limit node indices to count and sort indices for ascending ticks */
+    /* Limit node indices to count and sort indices for monotonic ticks */
     const limitedSortedIndices = sortedIndices
       .slice(0, count)
-      .sort((i: number, j: number): number =>
-        TickEncoder.encode({ ...nodes[i].tick, limit: nodes[i].limit }) <=
-        TickEncoder.encode({ ...nodes[j].tick, limit: nodes[j].limit })
-          ? -1
-          : 1,
-      );
+      .sort((i, j): number => (!nodeGreaterThan(nodes[i], nodes[j]) ? -1 : 1));
 
     /* Map limited, sorted node indices back to nodes */
     return limitedSortedIndices.map((i) => nodes[i]);
