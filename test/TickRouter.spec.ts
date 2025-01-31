@@ -199,6 +199,27 @@ describe('TickRouter', function () {
     expect(router._filterNodes(nodes, 35 * 86400)).toEqual([]);
   });
 
+  it('#_crawlNodes', function () {
+    expect(router._crawlNodes(router._decodeNodes(TEST_NODES_3.slice(1)), 3).map((r) => r.map((e) => e.limit))).toEqual(
+      [
+        [50n],
+        [50n, 100n],
+        [50n, 100n, 150n],
+        [50n, 100n, 200n],
+        [50n, 150n],
+        [50n, 150n, 200n],
+        [50n, 200n],
+        [100n],
+        [100n, 150n],
+        [100n, 150n, 200n],
+        [100n, 200n],
+        [150n],
+        [150n, 200n],
+        [200n],
+      ],
+    );
+  });
+
   it('#_traverseNodes', function () {
     expect(router._traverseNodes(router._decodeNodes(TEST_NODES_1), 1)).toEqual({
       amount: 100n,
@@ -224,10 +245,9 @@ describe('TickRouter', function () {
         { tick: { limit: 5n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 5n, available: 5n },
         { tick: { limit: 10n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 10n, available: 1n },
         { tick: { limit: 10n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 10n, available: 4n },
-        { tick: { limit: 15n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 15n, available: 10n },
         { tick: { limit: 20n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 20n, available: 4n },
-        { tick: { limit: 20n, duration: 0, rate: 2, limitType: LimitType.Absolute }, limit: 20n, available: 1n },
         { tick: { limit: 25n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 25n, available: 5n },
+        { tick: { limit: 25n, duration: 0, rate: 1, limitType: LimitType.Absolute }, limit: 25n, available: 12n },
       ],
     });
 

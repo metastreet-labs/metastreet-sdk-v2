@@ -88,48 +88,70 @@ export class TickRouter {
     }
   }
 
-  _traverseNodes(nodes: DecodedLiquidityNode[], multiplier: number): { amount: bigint; route: DecodedLiquidityNode[] } {
+  _crawlNodes(nodes: DecodedLiquidityNode[], depth: number): DecodedLiquidityNode[][] {
+    /* Base case */
+    if (depth == 0 || nodes.length == 0) return [];
+
+    const routes: DecodedLiquidityNode[][] = [];
+    for (const candidate of nodes) {
+      /* Trivial route */
+      routes.push([candidate]);
+
+      /* Crawl subroutes starting from this node */
+      this._crawlNodes(
+        nodes.filter((node) => nodeGreaterThan(node, candidate)),
+        depth - 1,
+      ).map((route) => {
+        routes.push([candidate].concat(route));
+      });
+    }
+
+    return routes;
+  }
+
+  _traverseNodes(
+    nodes: DecodedLiquidityNode[],
+    multiplier: number,
+    depth: number = 8,
+  ): { amount: bigint; route: DecodedLiquidityNode[] } {
     /* Cumulative amount and route taken */
     let amount = 0n;
     const route: DecodedLiquidityNode[] = [];
 
     while (true) {
       /* Filter available nodes by tick limit and monotonic tick */
-      const availableNodes = nodes.filter((node) => {
-        return (
+      const availableNodes = nodes.filter(
+        (node) =>
           node.available > 0n &&
           node.limit * BigInt(multiplier) > amount &&
-          TickEncoder.encode({ ...node.tick, limit: node.limit }) >
-            (route.length == 0
-              ? 0n
-              : TickEncoder.encode({ ...route[route.length - 1].tick, limit: route[route.length - 1].limit }))
-        );
-      });
+          (route.length > 0 ? nodeGreaterThan(node, route[route.length - 1]) : true),
+      );
 
       /* If no nodes are available, break */
       if (availableNodes.length === 0) break;
 
-      /* Sort nodes by 1) limit (increasing), 2) rate (increasing), 3) duration
-       * (decreasing), 4) limit type (absolute before ratio). This assumes that
-       * ticks with lower limits will have lower rates. */
-      availableNodes.sort((a: DecodedLiquidityNode, b: DecodedLiquidityNode): number =>
-        a.limit < b.limit
-          ? -1
-          : a.limit > b.limit
-          ? 1
-          : a.tick.rate < b.tick.rate
-          ? -1
-          : a.tick.rate > b.tick.rate
-          ? 1
-          : a.tick.duration < b.tick.duration
-          ? -1
-          : (a.tick.limitType ?? 0) < (b.tick.limitType ?? 0)
-          ? -1
-          : 1,
+      /* Sort nodes by tick limit */
+      availableNodes.sort((a, b): number => (a.limit < b.limit ? -1 : 1));
+
+      /* Crawl nodes down to depth */
+      const subroutes: DecodedLiquidityNode[][] = this._crawlNodes(availableNodes, depth);
+
+      /* Source along subroutes */
+      const scoredSubroutes: { subamount: bigint; subcost: bigint; subroute: DecodedLiquidityNode[] }[] = subroutes.map(
+        (subroute: DecodedLiquidityNode[]) => {
+          const [subamount, _, costs] = this._sourceNodes(subroute, 2n ** 120n - 1n, multiplier, amount);
+          const subcost = costs.reduce((acc, value) => acc + value, 0n);
+          return { subamount, subcost, subroute };
+        },
       );
 
-      /* Pick best scoring node */
-      const bestNode = availableNodes[0];
+      /* Sort routes by maximum amount, followed by lowest cost */
+      scoredSubroutes.sort((a, b): number =>
+        a.subamount > b.subamount ? -1 : b.subamount > a.subamount ? 1 : a.subcost < b.subcost ? -1 : 1,
+      );
+
+      /* Pick first node from best scoring route for our next node */
+      const bestNode = scoredSubroutes[0].subroute[0];
 
       /* Update cumulative amount and route */
       amount += minBigInt(bestNode.limit * BigInt(multiplier) - amount, bestNode.available);

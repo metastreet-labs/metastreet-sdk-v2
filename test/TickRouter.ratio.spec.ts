@@ -182,19 +182,14 @@ describe('TickRouter (ratio)', function () {
       amount: 300n * 10n ** 18n,
       route: [
         {
-          tick: { limit: 10n * 100n, duration: 0, rate: 1, limitType: LimitType.Ratio },
-          limit: 40n * 10n ** 18n,
-          available: 100n * 10n ** 18n,
-        },
-        {
           tick: { limit: 50n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute },
           limit: 50n * 10n ** 18n,
           available: 1000n * 10n ** 18n,
         },
         {
-          tick: { limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute },
+          tick: { limit: 25n * 100n, duration: 0, rate: 0, limitType: LimitType.Ratio },
           limit: 100n * 10n ** 18n,
-          available: 500n * 10n ** 18n,
+          available: 100n * 10n ** 18n,
         },
         {
           tick: { limit: 150n * 10n ** 18n, duration: 0, rate: 1, limitType: LimitType.Absolute },
@@ -202,7 +197,7 @@ describe('TickRouter (ratio)', function () {
           available: 250n * 10n ** 18n,
         },
         {
-          tick: { limit: 200n * 10n ** 18n, duration: 0, rate: 2, limitType: LimitType.Absolute },
+          tick: { limit: 50n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio },
           limit: 200n * 10n ** 18n,
           available: 100n * 10n ** 18n,
         },
@@ -217,11 +212,6 @@ describe('TickRouter (ratio)', function () {
     expect(router._traverseNodes(router._decodeNodes(TEST_NODES, 400n * 10n ** 18n), 3)).toEqual({
       amount: 700n * 10n ** 18n,
       route: [
-        {
-          tick: { limit: 10n * 100n, duration: 0, rate: 1, limitType: LimitType.Ratio },
-          limit: 40n * 10n ** 18n,
-          available: 100n * 10n ** 18n,
-        },
         {
           tick: { limit: 50n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute },
           limit: 50n * 10n ** 18n,
@@ -290,18 +280,16 @@ describe('TickRouter (ratio)', function () {
     /* With collateral value */
     expect(router.route(TEST_NODES, 300n * 10n ** 18n, 30 * 86400, 1, 400n * 10n ** 18n)).toEqual([
       [
-        TickEncoder.encode({ limit: 10n * 100n, duration: 0, rate: 1, limitType: LimitType.Ratio }),
         TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
-        TickEncoder.encode({ limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
+        TickEncoder.encode({ limit: 25n * 100n, duration: 0, rate: 0, limitType: LimitType.Ratio }),
         TickEncoder.encode({ limit: 150n * 10n ** 18n, duration: 0, rate: 1, limitType: LimitType.Absolute }),
-        TickEncoder.encode({ limit: 200n * 10n ** 18n, duration: 0, rate: 2, limitType: LimitType.Absolute }),
+        TickEncoder.encode({ limit: 50n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
         TickEncoder.encode({ limit: 75n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
       ],
-      [40n * 10n ** 18n, 10n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 100n * 10n ** 18n],
+      [50n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 100n * 10n ** 18n],
     ]);
     expect(router.route(TEST_NODES, 700n * 10n ** 18n, 30 * 86400, 3, 400n * 10n ** 18n)).toEqual([
       [
-        TickEncoder.encode({ limit: 10n * 100n, duration: 0, rate: 1, limitType: LimitType.Ratio }),
         TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
         TickEncoder.encode({ limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
         TickEncoder.encode({ limit: 150n * 10n ** 18n, duration: 0, rate: 1, limitType: LimitType.Absolute }),
@@ -309,15 +297,7 @@ describe('TickRouter (ratio)', function () {
         TickEncoder.encode({ limit: 50n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
         TickEncoder.encode({ limit: 75n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
       ],
-      [
-        100n * 10n ** 18n,
-        50n * 10n ** 18n,
-        150n * 10n ** 18n,
-        150n * 10n ** 18n,
-        100n * 10n ** 18n,
-        50n * 10n ** 18n,
-        100n * 10n ** 18n,
-      ],
+      [150n * 10n ** 18n, 150n * 10n ** 18n, 150n * 10n ** 18n, 100n * 10n ** 18n, 50n * 10n ** 18n, 100n * 10n ** 18n],
     ]);
 
     /* Over available, with collateral value */
@@ -349,7 +329,7 @@ describe('TickRouter (ratio)', function () {
       expect(router.quote(TEST_NODES, [], 0n, 3 * 86400, 1, 400n * 10n ** 18n)).toEqual(0n);
       expect(router.quote(TEST_NODES, ticks, 0n, 3 * 86400, 1, 400n * 10n ** 18n)).toEqual(0n);
       expect(router.quote(TEST_NODES, ticks, 300n * 10n ** 18n, 3 * 86400, 1, 400n * 10n ** 18n)).toEqual(
-        300887671232786880000n,
+        300821917808121600000n,
       );
       expect(() => router.quote(TEST_NODES, [], 300n * 10n ** 18n, 3 * 86400, 1, 400n * 10n ** 18n)).toThrow(
         /Insufficient liquidity/,
@@ -363,7 +343,7 @@ describe('TickRouter (ratio)', function () {
     {
       const ticks = router.route(TEST_NODES, 700n * 10n ** 18n, 3 * 86400, 3, 400n * 10n ** 18n)[0];
       expect(router.quote(TEST_NODES, ticks, 700n * 10n ** 18n, 3 * 86400, 3, 400n * 10n ** 18n)).toEqual(
-        701808219177997120000n,
+        701643835616295040000n,
       );
     }
   });
