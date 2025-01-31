@@ -257,16 +257,34 @@ describe('TickRouter', function () {
     expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 999999n, 1)).toEqual([
       200n,
       [0n, 50n, 50n, 50n, 50n],
+      [0n, 50n, 50n, 100n, 150n],
     ]);
-    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 100n, 1)).toEqual([100n, [0n, 50n, 50n, 0n, 0n]]);
-    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 50n, 1)).toEqual([50n, [0n, 50n, 0n, 0n, 0n]]);
+    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 100n, 1)).toEqual([
+      100n,
+      [0n, 50n, 50n, 0n, 0n],
+      [0n, 50n, 50n, 0n, 0n],
+    ]);
+    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 50n, 1)).toEqual([
+      50n,
+      [0n, 50n, 0n, 0n, 0n],
+      [0n, 50n, 0n, 0n, 0n],
+    ]);
 
     expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 999999n, 3)).toEqual([
       550n,
       [0n, 150n, 150n, 150n, 100n],
+      [0n, 150n, 150n, 300n, 300n],
     ]);
-    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 300n, 3)).toEqual([300n, [0n, 150n, 150n, 0n, 0n]]);
-    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 50n, 3)).toEqual([50n, [0n, 50n, 0n, 0n, 0n]]);
+    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 300n, 3)).toEqual([
+      300n,
+      [0n, 150n, 150n, 0n, 0n],
+      [0n, 150n, 150n, 0n, 0n],
+    ]);
+    expect(router._sourceNodes(router._decodeNodes(TEST_NODES_3), 50n, 3)).toEqual([
+      50n,
+      [0n, 50n, 0n, 0n, 0n],
+      [0n, 50n, 0n, 0n, 0n],
+    ]);
   });
 
   it('#_pruneNodes', function () {

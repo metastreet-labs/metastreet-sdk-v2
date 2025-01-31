@@ -157,18 +157,24 @@ export class TickRouter {
     return limitedSortedIndices.map((i) => nodes[i]);
   }
 
-  _sourceNodes(nodes: DecodedLiquidityNode[], amount: bigint, multiplier: number): [bigint, bigint[]] {
+  _sourceNodes(
+    nodes: DecodedLiquidityNode[],
+    amount: bigint,
+    multiplier: number,
+    taken: bigint = 0n,
+  ): [bigint, bigint[], bigint[]] {
     /* Source as much liquidity from nodes as possible, up to the limit, amount
      * available, and amount remaining */
     const sources: bigint[] = [];
-    let taken = 0n;
+    const costs: bigint[] = [];
     for (const node of nodes) {
       const take = minBigInt(minBigInt(node.limit * BigInt(multiplier) - taken, node.available), amount - taken);
       sources.push(take);
+      costs.push(take * BigInt(node.tick.rate + 1));
       taken += take;
     }
 
-    return [taken, sources];
+    return [taken, sources, costs];
   }
 
   /****************************************************************************/
