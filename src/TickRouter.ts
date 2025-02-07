@@ -145,9 +145,17 @@ export class TickRouter {
         },
       );
 
-      /* Sort routes by maximum amount, followed by lowest cost */
+      /* Sort routes by maximum amount, followed by lowest cost, followed by longest route */
       scoredSubroutes.sort((a, b): number =>
-        a.subamount > b.subamount ? -1 : b.subamount > a.subamount ? 1 : a.subcost < b.subcost ? -1 : 1,
+        a.subamount > b.subamount
+          ? -1
+          : b.subamount > a.subamount
+          ? 1
+          : a.subcost < b.subcost
+          ? -1
+          : a.subroute.length > b.subroute.length
+          ? -1
+          : 1,
       );
 
       /* Pick first node from best scoring route for our next node */

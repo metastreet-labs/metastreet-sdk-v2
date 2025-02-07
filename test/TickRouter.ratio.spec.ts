@@ -187,9 +187,9 @@ describe('TickRouter (ratio)', function () {
           available: 1000n * 10n ** 18n,
         },
         {
-          tick: { limit: 25n * 100n, duration: 0, rate: 0, limitType: LimitType.Ratio },
+          tick: { limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute },
           limit: 100n * 10n ** 18n,
-          available: 100n * 10n ** 18n,
+          available: 500n * 10n ** 18n,
         },
         {
           tick: { limit: 150n * 10n ** 18n, duration: 0, rate: 1, limitType: LimitType.Absolute },
@@ -197,7 +197,7 @@ describe('TickRouter (ratio)', function () {
           available: 250n * 10n ** 18n,
         },
         {
-          tick: { limit: 50n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio },
+          tick: { limit: 200n * 10n ** 18n, duration: 0, rate: 2, limitType: LimitType.Absolute },
           limit: 200n * 10n ** 18n,
           available: 100n * 10n ** 18n,
         },
@@ -281,9 +281,9 @@ describe('TickRouter (ratio)', function () {
     expect(router.route(TEST_NODES, 300n * 10n ** 18n, 30 * 86400, 1, 400n * 10n ** 18n)).toEqual([
       [
         TickEncoder.encode({ limit: 50n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
-        TickEncoder.encode({ limit: 25n * 100n, duration: 0, rate: 0, limitType: LimitType.Ratio }),
+        TickEncoder.encode({ limit: 100n * 10n ** 18n, duration: 0, rate: 0, limitType: LimitType.Absolute }),
         TickEncoder.encode({ limit: 150n * 10n ** 18n, duration: 0, rate: 1, limitType: LimitType.Absolute }),
-        TickEncoder.encode({ limit: 50n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
+        TickEncoder.encode({ limit: 200n * 10n ** 18n, duration: 0, rate: 2, limitType: LimitType.Absolute }),
         TickEncoder.encode({ limit: 75n * 100n, duration: 0, rate: 2, limitType: LimitType.Ratio }),
       ],
       [50n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 50n * 10n ** 18n, 100n * 10n ** 18n],
