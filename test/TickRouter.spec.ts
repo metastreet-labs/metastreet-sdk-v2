@@ -118,6 +118,49 @@ describe('TickRouter', function () {
     router = new TickRouter([7 * 86400, 14 * 86400, 30 * 86400], [3170979198n, 9512937595n, 15854895991n]);
   });
 
+  it.skip('#fab1', function () {
+    const router2 = new TickRouter(
+      [62208000, 31104000, 15552000, 7776000, 5184000, 2592000, 604800, 259200],
+      [951293759n, 1585489599n, 3170979198n, 6341958396n, 9512937595n, 15854895991n, 31709791983n, 95129375951n],
+    );
+
+    const nodes = [
+      { tick: 128109n, available: 0n },
+      { tick: 512001n, available: 0n },
+      { tick: 512129n, available: 0n },
+      { tick: 1024013n, available: 48648359203551896427n },
+      { tick: 1024073n, available: 7000000000001000002n },
+      { tick: 2048085n, available: 14926066628931971917n },
+      { tick: 512000012n, available: 1000000n },
+    ];
+
+    const principal = router2.forecast(nodes, 180 * 86400, 1, 1000000000000000000000n);
+
+    console.log(principal);
+    console.log(router2.route(nodes, principal, 180 * 86400, 1, 1000000000000000000000n));
+  });
+
+  it.skip('#fab2', function () {
+    const router2 = new TickRouter(
+      [62208000, 31104000, 23328000, 15552000, 10368000, 7776000, 5184000, 2592000],
+      [1585489599n, 2219685438n, 3170979198n, 4122272957n, 4756468797n, 5390664637n, 6341958396n, 7927447995n],
+    );
+
+    const nodes = [
+      { tick: 512021n, available: 33082793444677866377000n },
+      { tick: 512141n, available: 0n },
+      { tick: 1280181n, available: 12500611242855610787000n },
+      { tick: 1792153n, available: 2603861200166863480700n },
+    ];
+    const collateralValue = 100000000000000000000n; // 100 USDC
+    const principal = router2.forecast(nodes, 5184000, 1, collateralValue, 10);
+    const ticks = router2.route(nodes, principal, 5184000, 1, collateralValue, 10);
+
+    console.log(principal);
+    console.log(ticks);
+    console.log(router2.quote(nodes, ticks[0], principal, 5184000, 1, collateralValue));
+  });
+
   it('#_decodeNodes', function () {
     expect(router._decodeNodes(TEST_NODES_1)).toEqual([
       { tick: { limit: 0n, duration: 0, rate: 0, limitType: LimitType.Absolute }, limit: 0n, available: 0n },
