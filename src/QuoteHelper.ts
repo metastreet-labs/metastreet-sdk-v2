@@ -26,8 +26,9 @@ export interface QuoteV2 {
   duration: bigint;
 }
 
-export interface SignedQuote {
-  quote: QuoteV1 | QuoteV2;
+export type Quote = QuoteV1 | QuoteV2;
+export interface SignedQuote<T = Quote> {
+  quote: T;
   signature: `0x${string}`;
 }
 
@@ -63,7 +64,7 @@ export class QuoteHelper {
    * @param quote Quote
    * @return Quote is type QuoteV1
    */
-  static isQuoteV1(quote: QuoteV1 | QuoteV2): quote is QuoteV1 {
+  static isQuoteV1(quote: Quote): quote is QuoteV1 {
     return 'tokenId' in quote;
   }
 
@@ -72,7 +73,7 @@ export class QuoteHelper {
    * @param quote Quote
    * @return Quote is type QuoteV2
    */
-  static isQuoteV2(quote: QuoteV1 | QuoteV2): quote is QuoteV2 {
+  static isQuoteV2(quote: Quote): quote is QuoteV2 {
     return 'startTokenId' in quote;
   }
 
@@ -97,7 +98,7 @@ export class QuoteHelper {
     price: bigint,
     timestamp: number | bigint,
     duration: number | bigint,
-  ): Promise<SignedQuote> {
+  ): Promise<SignedQuote<QuoteV1>> {
     const quote: QuoteV1 = {
       token,
       tokenId,
@@ -140,7 +141,7 @@ export class QuoteHelper {
     price: bigint,
     timestamp: number | bigint,
     duration: number | bigint,
-  ): Promise<SignedQuote> {
+  ): Promise<SignedQuote<QuoteV2>> {
     const quote: QuoteV2 = {
       token,
       startTokenId,
@@ -172,14 +173,14 @@ export class QuoteHelper {
         parseAbiParameters(
           '((address token,uint256 tokenId,address currency,uint256 price,uint64 timestamp,uint64 duration) quote,bytes signature)[]',
         ),
-        [signedQuotes as { quote: QuoteV1; signature: `0x${string}` }[]],
+        [signedQuotes as SignedQuote<QuoteV1>[]],
       );
     } else if (this.isQuoteV2(signedQuotes[0].quote)) {
       return encodeAbiParameters(
         parseAbiParameters(
           '((address token,uint256 startTokenId,uint256 endTokenId,address currency,uint256 price,uint64 timestamp,uint64 duration) quote,bytes signature)[]',
         ),
-        [signedQuotes as { quote: QuoteV2; signature: `0x${string}` }[]],
+        [signedQuotes as SignedQuote<QuoteV2>[]],
       );
     } else {
       throw new Error(`Unsupported quote type`);
